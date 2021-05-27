@@ -1,0 +1,9 @@
+[submodule "gateware/no2usb"]
+	path = gateware/cores/no2usb
+	url = https://github.com/no2fpga/no2usb.git
+[submodule "gateware/no2ice40"]
+	path = gateware/cores/no2ice40
+	url = https://github.com/no2fpga/no2ice40.git
+[submodule "gateware/cores/serv"]
+	path = gateware/cores/serv
+	url = https://github.com/no2fpga/serv.git
