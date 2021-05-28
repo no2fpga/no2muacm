@@ -46,3 +46,4 @@ clean:
 	rm -f *.json *.asc *.bin *.log
 
 .PHONY: all clean
+.PRECIOUS: %.ilang %.json %.asc %.bin
