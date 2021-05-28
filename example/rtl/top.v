@@ -9,10 +9,6 @@ module top (
 	inout  wire usb_dn,
 	output wire usb_pu,
 
-	// UART
-	input  wire uart_rx,
-	output wire uart_tx,
-
 	// Button
 	input  wire btn,
 
