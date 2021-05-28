@@ -1,3 +1,5 @@
+## pkg: sg48
+
 # USB
 set_io -nowarn usb_dp 42
 set_io -nowarn usb_dn 38

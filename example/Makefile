@@ -1,8 +1,9 @@
 PROJ := acm-loopback
 
 BOARD   ?= bitsy-v1
-DEVICE  := up5k
-PACKAGE := sg48
+PCF     := data/top-$(BOARD).pcf
+DEVICE  := $(shell awk '/^\#\# dev:/{print $$3; exit 1}' $(PCF) && echo up5k)
+PACKAGE := $(shell awk '/^\#\# pkg:/{print $$3; exit 1}' $(PCF) && echo sg48)
 
 SRCS_acm-loopback = $(addprefix rtl/, \
 	dfu_helper.v \
@@ -10,7 +11,6 @@ SRCS_acm-loopback = $(addprefix rtl/, \
 	sysmgr_pll.v \
 	top.v \
 )
-PCF := data/top-$(BOARD).pcf
 TOPMOD := top
 
 MUACM_ILANG := ../build/muacm.ilang
