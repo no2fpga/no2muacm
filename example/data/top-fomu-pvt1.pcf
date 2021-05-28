@@ -1,0 +1,12 @@
+## pkg: uwg30
+
+# USB
+set_io -nowarn usb_dp A1
+set_io -nowarn usb_dn A2
+set_io -nowarn usb_pu A4
+
+# Button
+set_io -nowarn -pullup yes -pullup_resistor 10K btn E4	# Pin 1
+
+# Clock
+set_io -nowarn clk_in F4
