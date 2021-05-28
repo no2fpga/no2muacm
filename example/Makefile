@@ -21,7 +21,7 @@ ICEPACK  := icepack
 DFU_UTIL := dfu-util
 
 SYNTH_ARGS :=
-NEXTPNR_ARGS := --no-promote-globals --timing-allow-fail
+NEXTPNR_ARGS := --no-promote-globals
 
 all: $(PROJ).bin
 
