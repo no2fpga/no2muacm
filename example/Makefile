@@ -13,7 +13,7 @@ SRCS_acm-loopback = $(addprefix rtl/, \
 )
 TOPMOD := top
 
-MUACM_ILANG := ../build/muacm.ilang
+MUACM_ILANG := ip/muacm.ilang
 
 YOSYS    := yosys
 NEXTPNR  := nextpnr-ice40
@@ -34,6 +34,9 @@ all: $(PROJ).bin
 
 %.bin: %.asc
 	$(ICEPACK) -s $< $@
+
+%.ilang: %.ilang.bz2
+	bzcat $< > $@
 
 
 prog: $(PROJ).bin
