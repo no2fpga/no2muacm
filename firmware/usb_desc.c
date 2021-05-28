@@ -25,7 +25,7 @@ static const struct usb_dev_desc desc_dev __attribute__((section(".usb_txbuf.des
 	.bDeviceProtocol	= 0,
 	.bMaxPacketSize0	= 64,
 	.idVendor		= 0x1d50,
-	.idProduct		= 0x6147,
+	.idProduct		= 0x6159,
 	.bcdDevice		= 0x0001,	/* v0.1 */
 	.iManufacturer		= 2,
 	.iProduct		= 3,
