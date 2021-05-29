@@ -17,7 +17,7 @@
 	 *  x1  - Task 0 PC
 	 *  x2  - Task 1 PC
 	 *  x3  - Task 2 PC
-	 *  x4  - USB frame tick
+	 *  x4  - USB frame tick timeout counter
 	 *  x5  - ?
 	 *  x6  - ?
 	 *  x7  - ?
@@ -473,6 +473,7 @@ _task1_loop:
 
 _task2_start:
 	// Init vars
+	li	x28, 64
 	li	x30, 0x1000		// ExtIF base
 	li	x16, 0x4b0		// EP_BD_CSR(0x82,0) = Current BD
 
@@ -502,18 +503,20 @@ _task2_loop:
 	lbu	x8, 4(x30)		// Grab CSR[7:0]  == Flags
 	lbu	x9, 5(x30)		// Grab CSR[15:8] == IN byte count
 
-	beq	x9, zero, 1b		// Check if empty
+	bne	x9, x28, 2f		// Check if empty
+	li	x4, -5			// Reset timeout counter if it is
+	j	1b
+2:
 
-	andi	x10, x9, 64		// Check if full
-	bne	x10, zero, 2f
+	blt	x9, x28, 3f		// Check if full or early ended
 
 	andi	x10, x8, 1<<5		// Check "Flush Now"
-	bne	x10, zero, 2f
+	bne	x10, zero, 3f
 
 	andi	x10, x8, 1<<4		// Check "Flush Timeout"
 	beq	x10, zero, 1b
 
-	// FIXME: Check usb frame here and if not timed out, branch to 1b
+	blt	x4, zero, 1b		// If timeout counter is still < 0, don't flush yet
 
 	// This is an early flush, disable ExtIF to avoid race conditions
 	// and reload the current length
@@ -521,7 +524,7 @@ _task2_loop:
 	lbu	x9, 5(x30)		// Grab CSR[15:8] == IN byte count
 
 	// Submit BD to USB core
-2:
+3:
 	addi	x9, x9, -1
 	andi	x9, x9, 63
 	addi	x9, x9, 1

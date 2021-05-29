@@ -82,6 +82,7 @@ module extif (
 	reg   [2:0] in_msb;
 	reg   [6:0] in_bcnt;
 	wire  [6:0] in_inc;
+	wire        in_end;
 	wire        in_we;
 
 	// OUT
@@ -178,18 +179,19 @@ module extif (
 			in_bcnt <= 7'h00;
 		end else begin
 			in_msb  <= b_we_in ? wb_wdata[8:6] : in_msb;
-			in_bcnt <= b_we_in ? { 7'd0 } : in_inc;
+			in_bcnt <= b_we_in ? { 7'd64 } : (in_inc & { ~in_end, 6'd63 });
 		end
 	end
 
-	assign in_inc = (in_bcnt + {6'd0, in_we}) | {in_last & in_valid & active, 6'd0};
+	assign in_end = in_last & in_valid & active;
+	assign in_inc = in_bcnt + {6'd0, in_we};
 
 	// Write when valid & ready
 	assign in_we = in_ready & in_valid;
 
 	// Ready when EIF is active (guaranteed no overlap with bus accesses)
 	// and when we have a non-full buffer
-	assign in_ready = active & ~in_bcnt[6];
+	assign in_ready = active & in_bcnt[6];
 
 	// EP TX for ExtIF IN
 	assign ep_tx_addr_0 = { in_msb, in_bcnt[5:1] };
