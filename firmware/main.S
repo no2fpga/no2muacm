@@ -89,6 +89,7 @@ _start:
  * x16 - Response: Current pointer to data (in txbuf)
  * x17 - Response: Remaining length
  * x18 - Response: Chunk length
+ * x19 - Response: Completion callback
  *
  * x30 - Constant: EP buffer base address
  */
@@ -164,6 +165,9 @@ _task0_do_setup:
 	// Release CEL
 	li	x8, USB_AR_CEL_RELEASE
 	sw	x8, USB_AR
+
+	// Default is no completion handler
+	li	x19, %lo(_task0_loop)
 
 	// Find handler
 	addi	x8, x30, %lo(_task0_handlers)
@@ -256,18 +260,8 @@ _task0_resp_nodata:
 	lh	x8, EP_BD_CSR(0x80, 0)
 	bge	x8, zero, 1b
 
-	// If this isn't SET_ADDRESS, we're done
-	li	x8, 0x0500
-	bne	x8, x12, _task0_loop
-
-	// This is a SET_ADDRESS, we need to setup address filtering
-	li	x8, USB_CSR_PU_ENA | USB_CSR_CEL_ENA | USB_CSR_ADDR_MATCH
-	andi	x13, x13, 0x7f	// Safery
-	add	x8, x8, x13
-	sw	x8, USB_CSR
-
-	// Now done
-	j	_task0_loop
+	// Done, call completion handler
+	jr	x19
 
 
 /*
@@ -305,8 +299,17 @@ _task0_h_get_status:
 
  /* SET_ADDRESS: Need to enable address filtering _after_ the status stage ! */
 _task0_h_set_address:
-	// Return
-	j	_task0_resp_nodata
+	// No data, but we have a completion handler
+	jal	x19, _task0_resp_nodata
+
+	// Setup address filtering
+	li	x8, USB_CSR_PU_ENA | USB_CSR_CEL_ENA | USB_CSR_ADDR_MATCH
+	andi	x13, x13, 0x7f	// Safety
+	add	x8, x8, x13
+	sw	x8, USB_CSR
+
+	// Done
+	j	_task0_loop
 
  /* GET_DESCRIPTOR: Lookup in 'desc_table' */
 _task0_h_get_descriptor:
