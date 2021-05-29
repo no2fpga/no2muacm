@@ -415,10 +415,6 @@ _task1_start:
 	li	x30, 0x1000		// ExtIF base
 	li	x16, 0x490		// EP_BD_CSR(0x02,0) = Current BD
 
-	// Enable ExtIF (FIXME: done twice ?)
-	li	x8, 1
-	sw	x8, 4(x30)
-
 	// Submit two BD as part of init
 	li	x8, USB_BD_STATE_RDY_DATA | USB_BD_LEN(64)
 	sw	x8, EP_BD_CSR(0x02, 0)
