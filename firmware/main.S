@@ -370,14 +370,15 @@ _task0_h_msos20:
 
  /* DFU_DETACH (only required request for runtime mode) */
 _task0_h_dfu_detach:
-	// FIXME wait for response being sent ?
+	// No data, but we have a completion handler
+	jal	x19, _task0_resp_nodata
+
+	// Trigger reboots
 	li	x8, 0x1000
 	sw	zero, 0(x8)
-	j	_task0_resp_nodata
 
-
-
-
+	// Done
+	j	_task0_loop
 
 
 /*
