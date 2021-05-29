@@ -182,7 +182,7 @@ module extif (
 		end
 	end
 
-	assign in_inc = (in_bcnt + {6'd0, in_we}) | {in_last & 6'd0};
+	assign in_inc = (in_bcnt + {6'd0, in_we}) | {in_last & in_valid & active, 6'd0};
 
 	// Write when valid & ready
 	assign in_we = in_ready & in_valid;
