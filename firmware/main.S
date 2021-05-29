@@ -90,11 +90,7 @@ _start:
  * x17 - Response: Remaining length
  * x18 - Response: Chunk length
  *
- * x19 - USB Conf # ?
- * x20 - USB Address ?
- *
  * x30 - Constant: EP buffer base address
- * x31 - Link register for function calls
  */
 
 #define	yield	jalr x1, x2
@@ -102,13 +98,12 @@ _start:
 _task0_start:
 
 	// Setup EP0 BD CSR to RX of SETUP
-	// (at this oint EP0 OUT DATA and EP0 IN DATA should be 0 already)
 	li	x8, USB_BD_STATE_RDY_DATA | USB_BD_LEN(64)
 	sw	x8, EP_BD_CSR(0x00, 1)	// EP 0 OUT SETUP
 
 	// Wait for something
 _task0_loop:
-	jal	x1, 1f
+	jal	x1, 1f			// Set x1
 1:
 	//j	_task0_common_loop	// (No need for jump, it's right below ...)
 
@@ -405,7 +400,12 @@ _task0_handlers:
 
 /* Task 1 Register usage:
  *
- * FILL ME
+ * x8  - General purpose temp register
+ * x9  - General purpose temp register
+ *
+ * x16 - Pointer to current buffer descriptor CSR
+ *
+ * x29 - Constant: ExtIF base address
  */
 
 #define	yield	jalr x2, x3
@@ -424,6 +424,7 @@ _task1_loop:
 	// Wait for BD to be filled
 1:
 	yield
+
 	lh	x8, 0(x16)
 	bge	x8, zero, 1b
 
@@ -463,7 +464,14 @@ _task1_loop:
 
 /* Task 2 Register usage:
  *
- * FILL ME
+ * x8  - General purpose temp register
+ * x9  - General purpose temp register
+ * x10 - General purpose temp register
+ *
+ * x16 - Pointer to current buffer descriptor CSR
+ *
+ * x28 - Constant: 64
+ * x29 - Constant: ExtIF base address
  */
 
 #define	yield	jalr x3, x1
