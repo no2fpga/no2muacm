@@ -412,7 +412,7 @@ _task0_handlers:
 
 _task1_start:
 	// Init vars
-	li	x30, 0x1000		// ExtIF base
+	li	x29, 0x1000		// ExtIF base
 	li	x16, 0x490		// EP_BD_CSR(0x02,0) = Current BD
 
 	// Submit two BD as part of init
@@ -434,12 +434,13 @@ _task1_loop:
 	addi	x8, x8, -1		// Remove 1 since ExtIF.OUT is (len-1)
 	lh	x9, 4(x16)		// Grab pointer
 	or	x8, x8, x9		// Combine length with pointer
-	sw	x8, 12(x30)		// Send to ExtIF.OUT
+	sw	x8, 12(x29)		// Send to ExtIF.OUT
 
 	// Wait for ExtIF OUT to be done
 1:
 	yield
-	lb	x8, 4(x30)
+
+	lb	x8, 4(x29)
 	blt	x8, zero, 1b
 
 	// Resubmit this buffer
@@ -470,24 +471,25 @@ _task1_loop:
 _task2_start:
 	// Init vars
 	li	x28, 64
-	li	x30, 0x1000		// ExtIF base
+	li	x29, 0x1000		// ExtIF base
 	li	x16, 0x4b0		// EP_BD_CSR(0x82,0) = Current BD
 
 _task2_loop:
 	// Wait for BD to be NONE or DONE
 1:
 	yield
+
 	lh	x8, 0(x16)
 	andi	x8, x8, -2048		// Mask out 'len'
 	blt	zero, x8, 1b
 
 	// Submit this buffer to ExtIF IN
 	lh	x8, 4(x16)		// Grab pointer
-	sw	x8, 8(x30)		// Send to ExtIF.IN
+	sw	x8, 8(x29)		// Send to ExtIF.IN
 
 	// Re-enable ExtIF in case we disabled it
 	li	x8, 1
-	sw	x8, 4(x30)
+	sw	x8, 4(x29)
 
 	// Wait for either :
 	//  - Timeout if "Flush by timeout" is enabled
@@ -496,8 +498,8 @@ _task2_loop:
 1:
 	yield
 
-	lbu	x8, 4(x30)		// Grab CSR[7:0]  == Flags
-	lbu	x9, 5(x30)		// Grab CSR[15:8] == IN byte count
+	lbu	x8, 4(x29)		// Grab CSR[7:0]  == Flags
+	lbu	x9, 5(x29)		// Grab CSR[15:8] == IN byte count
 
 	bne	x9, x28, 2f		// Check if empty
 	li	x4, -5			// Reset timeout counter if it is
@@ -516,8 +518,8 @@ _task2_loop:
 
 	// This is an early flush, disable ExtIF to avoid race conditions
 	// and reload the current length
-	sw	zero, 4(x30)
-	lbu	x9, 5(x30)		// Grab CSR[15:8] == IN byte count
+	sw	zero, 4(x29)
+	lbu	x9, 5(x29)		// Grab CSR[15:8] == IN byte count
 
 	// Submit BD to USB core
 3:
