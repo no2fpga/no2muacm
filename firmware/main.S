@@ -336,15 +336,21 @@ _task0_h_set_configuration:
 	// Return
 	j	_task0_resp_nodata
 
- /* GET_INTERFACE: Always return { 0x00 } */
+ /* GET_INTERFACE: Always return { 0x00 } since we have no alt interface */
 _task0_h_get_interface:
+	// Setup response
+	sw	zero, %lo(ep0_tx)(x30)
+
+	li	x16, %lo(ep0_tx)
+	li	x17, 1
+
 	// Return
 	j	_task0_resp_data
 
- /* SET_INTERFACE: Ignore the data and assume only send 0 since we only have 1 alt */
+ /* SET_INTERFACE: Since we have no alt interface, we can STALL */
  _task0_h_set_interface:
  	// Return
-	j	_task0_resp_nodata
+	j	_task0_resp_stall
 
  /* Microsoft OS 2.0 Descriptors support */
 _task0_h_msos20:
