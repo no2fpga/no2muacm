@@ -2,8 +2,10 @@ PROJ := acm-loopback
 
 BOARD   ?= bitsy-v1
 PCF     := data/top-$(BOARD).pcf
-DEVICE  := $(shell awk '/^\#\# dev:/{print $$3; exit 1}' $(PCF) && echo up5k)
-PACKAGE := $(shell awk '/^\#\# pkg:/{print $$3; exit 1}' $(PCF) && echo sg48)
+
+H := \#
+DEVICE  := $(shell awk '/$(H)$(H) dev:/{print $$3; exit 1}' $(PCF) && echo up5k)
+PACKAGE := $(shell awk '/$(H)$(H) pkg:/{print $$3; exit 1}' $(PCF) && echo sg48)
 
 SRCS_acm-loopback = $(addprefix rtl/, \
 	dfu_helper.v \
