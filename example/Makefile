@@ -28,7 +28,7 @@ NEXTPNR_ARGS := --no-promote-globals
 all: $(PROJ).bin
 
 
-%.json %.synth.log: $(MUACM_ILANG) $(SRCS_$(PROJ)) 
+%.json %.synth.log: $(MUACM_ILANG) $(SRCS_$(PROJ))
 	$(YOSYS) -L $*.synth.log -p 'read_verilog $(SRCS_$(PROJ)); read_ilang $(MUACM_ILANG); synth_ice40 $(SYNTH_ARGS) -top $(TOPMOD) -json $*.json'
 
 %.asc %.pnr.log: $(PCF) %.json
