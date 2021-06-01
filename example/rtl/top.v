@@ -36,9 +36,10 @@ module top (
 	wire       bootloader;
 
 	// Clock / Reset
-	wire clk;
-	wire rst;
 	wire rst_in;
+
+	wire clk_usb;
+	wire rst_usb;
 
 
 	// uACM
@@ -59,8 +60,8 @@ module top (
 		.out_valid     (out_valid ),
 		.out_ready     (out_ready ),
 		.bootloader    (bootloader),
-		.clk           (clk),
-		.rst           (rst)
+		.clk           (clk_usb),
+		.rst           (rst_usb)
 	);
 
 	// Loopback
@@ -86,8 +87,8 @@ module top (
 		.btn_tick (),
 		.btn_val  (),
 		.btn_press(rst_in),
-		.clk      (clk),
-		.rst      (rst)
+		.clk      (clk_usb),
+		.rst      (rst_usb)
 	);
 `else
 	assign rst_in = 1'b0;
@@ -106,15 +107,15 @@ module top (
 `ifdef HFOSC
 	sysmgr_hfosc sysmgr_I (
 		.rst_in (rst_in),
-		.clk_out(clk),
-		.rst_out(rst)
+		.clk_out(clk_usb),
+		.rst_out(rst_usb)
 	);
 `else
 	sysmgr_pll sysmgr_I (
 		.clk_in (clk_in),
 		.rst_in (rst_in),
-		.clk_out(clk),
-		.rst_out(rst)
+		.clk_48m(clk_usb),
+		.rst_out(rst_usb)
 	);
 `endif
 

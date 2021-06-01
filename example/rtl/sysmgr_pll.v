@@ -3,7 +3,8 @@
  *
  * vim: ts=4 sw=4
  *
- * CRG generating 36 or 48 MHz from external 12 MHz
+ * CRG generating 24 & 48 MHz from external 12/48 MHz
+ * (depending on board)
  *
  * Copyright (C) 2021  Sylvain Munaut <tnt@246tNt.com>
  * SPDX-License-Identifier: CERN-OHL-P-2.0
@@ -14,7 +15,8 @@
 module sysmgr_pll (
 	input  wire clk_in,
 	input  wire rst_in,
-	output wire clk_out,
+	output wire clk_24m,
+	output wire clk_48m,
 	output wire rst_out
 );
 
@@ -22,7 +24,8 @@ module sysmgr_pll (
 	wire pll_lock;
 	wire pll_reset_n;
 
-	wire clk_i;
+	wire clk_1x;
+	wire clk_2x;
 	wire rst_i;
 	reg [3:0] rst_cnt;
 
@@ -35,7 +38,13 @@ module sysmgr_pll (
 
 	// PLL instance
 `ifdef SIM
-	assign clk_i = clk_in;
+	reg clk_div = 1'b0;
+
+	always @(posedge clk_in)
+		clk_div <= ~clk_div;
+
+	assign clk_1x = clk_div;
+	assign clk_2x = clk_in;
 	assign pll_lock = pll_reset_n;
 
 	initial
@@ -60,15 +69,15 @@ module sysmgr_pll (
 		.FDA_FEEDBACK(4'b0000),
 		.SHIFTREG_DIV_MODE(2'b00),
 		.PLLOUT_SELECT_PORTA("GENCLK"),
-		.PLLOUT_SELECT_PORTB("GENCLK"),
+		.PLLOUT_SELECT_PORTB("GENCLK_HALF"),
 		.ENABLE_ICEGATE_PORTA(1'b0),
 		.ENABLE_ICEGATE_PORTB(1'b0)
 	) pll_I (
 		.PACKAGEPIN     (clk_in),
 		.PLLOUTCOREA    (),
-		.PLLOUTGLOBALA  (clk_i),
+		.PLLOUTGLOBALA  (clk_2x),
 		.PLLOUTCOREB    (),
-		.PLLOUTGLOBALB  (),
+		.PLLOUTGLOBALB  (clk_1x),
 		.EXTFEEDBACK    (1'b0),
 		.DYNAMICDELAY   (8'h00),
 		.RESETB         (pll_reset_n),
@@ -81,13 +90,14 @@ module sysmgr_pll (
 	);
 `endif
 
-	assign clk_out = clk_i;
+	assign clk_24m = clk_1x;
+	assign clk_48m = clk_2x;
 
 	// PLL reset generation
 	assign pll_reset_n = ~rst_in;
 
 	// Logic reset generation
-	always @(posedge clk_i or negedge pll_lock)
+	always @(posedge clk_1x or negedge pll_lock)
 		if (!pll_lock)
 			rst_cnt <= 4'h8;
 		else if (rst_cnt[3])
