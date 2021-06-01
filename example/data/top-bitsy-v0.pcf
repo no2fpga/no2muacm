@@ -10,3 +10,4 @@ set_io -nowarn -pullup yes -pullup_resistor 10K btn 10
 
 # Clock
 set_io -nowarn clk_in 35
+set_frequency clk_in 12
