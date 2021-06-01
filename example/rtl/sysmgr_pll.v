@@ -11,9 +11,7 @@
 
 `default_nettype none
 
-module sysmgr_pll #(
-	parameter integer SLOW = 0	// 1=36MHz, 0=48MHz
-)(
+module sysmgr_pll (
 	input  wire clk_in,
 	input  wire rst_in,
 	output wire clk_out,
@@ -28,6 +26,13 @@ module sysmgr_pll #(
 	wire rst_i;
 	reg [3:0] rst_cnt;
 
+	// Clock frequency input depends on board
+`ifdef BOARD_FOMU_HACKER
+`define CLK_IN_48M
+`elsif BOARD_FOMU_PVT1
+`define CLK_IN_48M
+`endif
+
 	// PLL instance
 `ifdef SIM
 	assign clk_i = clk_in;
@@ -37,10 +42,19 @@ module sysmgr_pll #(
 		rst_cnt <= 4'h8;
 `else
 	SB_PLL40_2F_PAD #(
+`ifdef CLK_IN_48M
+		// clk_in is 48 MHz
 		.DIVR(4'b0000),
-		.DIVF(SLOW ? 7'b0101111 : 7'b0111111),
+		.DIVF(7'b0001111),
+		.DIVQ(3'b100),
+		.FILTER_RANGE(3'b100),
+`else
+		// clk_in is 12 MHz
+		.DIVR(4'b0000),
+		.DIVF(7'b0111111),
 		.DIVQ(3'b100),
 		.FILTER_RANGE(3'b001),
+`endif
 		.FEEDBACK_PATH("SIMPLE"),
 		.DELAY_ADJUSTMENT_MODE_FEEDBACK("FIXED"),
 		.FDA_FEEDBACK(4'b0000),
