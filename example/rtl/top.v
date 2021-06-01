@@ -99,8 +99,12 @@ module top (
 `else
 	assign rst_in = 1'b0;
 
+	reg boot = 1'b0;
+	always @(posedge clk_usb)
+		boot <= boot | bootloader;
+
 	SB_WARMBOOT warmboot (
-		.BOOT (bootloader),
+		.BOOT (boot),
 		.S0   (BOOT_IMAGE[0]),
 		.S1   (BOOT_IMAGE[1])
 	);
