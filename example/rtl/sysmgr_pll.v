@@ -31,8 +31,10 @@ module sysmgr_pll (
 
 	// Clock frequency input depends on board
 `ifdef BOARD_FOMU_HACKER
+`define CLK_IN_FABRIC
 `define CLK_IN_48M
 `elsif BOARD_FOMU_PVT1
+`define CLK_IN_FABRIC
 `define CLK_IN_48M
 `endif
 
@@ -50,7 +52,11 @@ module sysmgr_pll (
 	initial
 		rst_cnt <= 4'h8;
 `else
+`ifdef CLK_IN_FABRIC
+	SB_PLL40_2F_CORE #(
+`else
 	SB_PLL40_2F_PAD #(
+`endif
 `ifdef CLK_IN_48M
 		// clk_in is 48 MHz
 		.DIVR(4'b0000),
@@ -73,7 +79,11 @@ module sysmgr_pll (
 		.ENABLE_ICEGATE_PORTA(1'b0),
 		.ENABLE_ICEGATE_PORTB(1'b0)
 	) pll_I (
+`ifdef CLK_IN_FABRIC
+		.REFERENCECLK   (clk_in),
+`else
 		.PACKAGEPIN     (clk_in),
+`endif
 		.PLLOUTCOREA    (),
 		.PLLOUTGLOBALA  (clk_2x),
 		.PLLOUTCOREB    (),
