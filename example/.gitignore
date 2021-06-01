@@ -1,3 +1,5 @@
 ip/
+*.json
+*.asc
 *.bin
 *.log
