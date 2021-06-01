@@ -46,6 +46,9 @@ module top (
 	wire clk_usb;
 	wire rst_usb;
 
+	wire clk_usr;
+	wire rst_usr;
+
 
 	// uACM
 	// ----
@@ -115,18 +118,45 @@ module top (
 	// -------------
 
 `ifdef HFOSC
+
+	// Use HF OSC to generate USB clock
 	sysmgr_hfosc sysmgr_I (
 		.rst_in (rst_in),
 		.clk_out(clk_usb),
 		.rst_out(rst_usb)
 	);
+
+	// Use the clock input "as-is" for user clock
+	assign clk_usr = clk_in;
+
+	// Generate a reset signal with synchronized release in clk_usr
+	reg rst_usr_r;
+
+	always @(posedge clk_usr or posedge rst_usb)
+		if (rst_usb)
+			rst_usr_r <= 1'b1;
+		else
+			rst_usr_r <= 1'b0;
+
+	SB_GB rst_gbuf_I (
+		.USER_SIGNAL_TO_GLOBAL_BUFFER(rst_usr_r),
+		.GLOBAL_BUFFER_OUTPUT(rst_usr)
+	);
+
 `else
+
+	// Generate both 48 MHz (for USB) and 24 MHz (for "user") out of the PLL
 	sysmgr_pll sysmgr_I (
 		.clk_in (clk_in),
 		.rst_in (rst_in),
 		.clk_48m(clk_usb),
+		.clk_24m(clk_usr),
 		.rst_out(rst_usb)
 	);
+
+	// They're both from PLL and sync "enough" to use the same signal
+	assign rst_usr = rst_usb;
+
 `endif
 
 endmodule // top
