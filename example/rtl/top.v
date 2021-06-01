@@ -16,6 +16,11 @@ module top (
 	input  wire clk_in
 );
 
+	// Which image to reboot to
+	// 01 for no2bootloader, 00 for foboot
+	localparam [1:0] BOOT_IMAGE = 2'b01;
+
+
 	// Signals
 	// -------
 
@@ -79,7 +84,8 @@ module top (
 
 `ifdef WITH_BUTTON
 	dfu_helper #(
-		.BTN_MODE(3)
+		.BTN_MODE(3),
+		.BOOT_IMAGE(BOOT_IMAGE)
 	) dfu_helper_I (
 		.boot_sel (2'b01),
 		.boot_now (bootloader),
@@ -95,8 +101,8 @@ module top (
 
 	SB_WARMBOOT warmboot (
 		.BOOT (bootloader),
-		.S0   (1'b1),
-		.S1   (1'b0)
+		.S0   (BOOT_IMAGE[0]),
+		.S1   (BOOT_IMAGE[1])
 	);
 `endif
 
