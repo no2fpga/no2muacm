@@ -9,6 +9,8 @@ PACKAGE := $(shell awk '/$(H)$(H) pkg:/{print $$3; exit 1}' $(PCF) && echo sg48)
 
 SRCS_acm-loopback = $(addprefix rtl/, \
 	dfu_helper.v \
+	fifo_sync_shift.v \
+	muacm_xclk.v \
 	sysmgr_hfosc.v \
 	sysmgr_pll.v \
 	top.v \
