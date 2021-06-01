@@ -441,7 +441,7 @@ _task1_loop:
 	// Submit this to ExtIF OUT
 	andi	x8, x8, 0x3ff		// Keep length only
 	addi	x8, x8, -2		// Remove CRC len
-	beq	x8, zero, 2f		// Check it's not ZLP
+	bge	zero, x8, 2f		// Check it's not ZLP (or err if negative)
 	addi	x8, x8, -1		// Remove 1 since ExtIF.OUT is (len-1)
 	lh	x9, 4(x16)		// Grab pointer
 	or	x8, x8, x9		// Combine length with pointer
