@@ -74,6 +74,7 @@ $(OUT_DIR)/muacm.ilang: $(OUT_DIR) $(HEX_DATA) $(SRCS_SERV) $(SRCS_NO2USB) $(SRC
 # Test bench
 $(OUT_DIR)/%_tb: $(OUT_DIR) $(HEX_DATA) $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM) sim/%_tb.v
 	iverilog \
+		-DNO_ICE40_DEFAULT_ASSIGNMENTS \
 		-DSIM -DSERV_INIT_RAM=\"cpu_rf.hex\" \
 		-DSIM_TRACE \
 		-o $@ \
