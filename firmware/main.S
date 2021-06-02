@@ -479,6 +479,7 @@ _task1_loop:
  * x10 - General purpose temp register
  *
  * x16 - Pointer to current buffer descriptor CSR
+ * x17 - Size of last sent packet (to evaluate ZLP need)
  *
  * x28 - Constant: 64
  * x29 - Constant: ExtIF base address
@@ -490,7 +491,9 @@ _task2_start:
 	// Init vars
 	li	x28, 64
 	li	x29, 0x1000		// ExtIF base
+
 	li	x16, 0x4b0		// EP_BD_CSR(0x82,0) = Current BD
+	li	x17, 0
 
 _task2_loop:
 	// Wait for BD to be NONE or DONE
@@ -519,12 +522,13 @@ _task2_loop:
 	lbu	x8, 4(x29)		// Grab CSR[7:0]  == Flags
 	lbu	x9, 5(x29)		// Grab CSR[15:8] == IN byte count
 
+	beq	x17, x28, 2f		// Check if last packet was MPS
 	bne	x9, x28, 2f		// Check if empty
-	li	x4, -5			// Reset timeout counter if it is
-	j	1b
+	li	x4, -5			// Reset timeout counter if empty and
+	j	1b			// last packet was not MPS
 2:
 
-	blt	x9, x28, 3f		// Check if full or early ended
+	blt	x9, x28, 4f		// Check if full or early ended
 
 	andi	x10, x8, 1<<5		// Check "Flush Now"
 	bne	x10, zero, 3f
@@ -536,21 +540,26 @@ _task2_loop:
 
 	// This is an early flush, disable ExtIF to avoid race conditions
 	// and reload the current length
+3:
 	sw	zero, 4(x29)
 	lbu	x9, 5(x29)		// Grab CSR[15:8] == IN byte count
 
 	// Submit BD to USB core
-3:
-	addi	x9, x9, -1
-	andi	x9, x9, 63
-	addi	x9, x9, 1
+4:
+	xori	x17, x9, 64		// Compute actual size (0 - 64)
+	bge	x28, x17, 5f		// from CSR[15:8]
+	addi	x17, x17, -64
+5:
 
 	li	x8, USB_BD_STATE_RDY_DATA
-	or	x8, x8, x9
+	or	x8, x8, x17
 	sw	x8, 0(x16)
 
 	// Next BD
 	xori	x16, x16, 0x0008
+
+	// Reset timeout since we just sent something
+	li	x4, -5
 
 	// Loop
 	j	_task2_loop
