@@ -1,0 +1,11 @@
+## pkg: cm81
+## dev: lp8k
+
+# USB
+set_io -nowarn usb_dp B4
+set_io -nowarn usb_dn A4
+set_io -nowarn usb_pu A3
+
+# Clock
+set_io -nowarn clk_in B2
+set_frequency clk_in 16

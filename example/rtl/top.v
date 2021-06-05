@@ -10,15 +10,17 @@ module top (
 	inout  wire usb_dn,
 	output wire usb_pu,
 
+`ifdef WITH_BUTTON
 	// Button
 	input  wire btn,
+`endif
 
 	// Clock
 	input  wire clk_in
 );
 
 	// Which image to reboot to
-	// 01 for no2bootloader, 00 for foboot
+	// 01 for no2bootloader, 00 for foboot/tinyfpga-bootloader
 	localparam [1:0] BOOT_IMAGE = 2'b01;
 
 

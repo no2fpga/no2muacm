@@ -36,6 +36,9 @@ module sysmgr_pll (
 `elsif BOARD_FOMU_PVT1
 `define CLK_IN_FABRIC
 `define CLK_IN_48M
+`elsif BOARD_TINYFPGA_BX
+`define CLK_IN_FABRIC
+`define CLK_IN_16M
 `endif
 
 	// PLL instance
@@ -63,6 +66,12 @@ module sysmgr_pll (
 		.DIVF(7'b0001111),
 		.DIVQ(3'b100),
 		.FILTER_RANGE(3'b100),
+`elsif CLK_IN_16M
+		// clk_in is 16 MHz
+		.DIVR(4'b0000),
+		.DIVF(7'b0101111),
+		.DIVQ(3'b100),
+		.FILTER_RANGE(3'b001),
 `else
 		// clk_in is 12 MHz
 		.DIVR(4'b0000),

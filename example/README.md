@@ -134,6 +134,7 @@ Supported boards:
   - `bitsy-v1`: iCEbreaker bitsy rev 1.x
   - `fomu-hacker`: FOMU hacker board
   - `fomu-pvt1`: FOMU production board
+  - `tinyfpga-bx`: TinyFPGA-BX board
 
 Make sure to run `make clean` between changing board configuration
 since simply changing the `BOARD` variable will not trigger a rebuild.
@@ -167,6 +168,29 @@ by using tweezers).
 If you have replaced the bootloader on your FOMU with `no2bootloader`
 instead, then the notes above regarding the `BOOT_IMAGE` settings don't
 apply.
+
+
+### TinyFPGA-BX
+
+This board is using the `iCE40 LP8k` and as such doesn't have an internal
+48 MHz oscillator. You must make sure the `HFOSC` option is not selected.
+
+Also, the only button present on this board is directly wired to the
+fpga reset pin and is not accessible to the user, so the `WITH_BUTTON`
+must also be disabled.
+
+The default bootloader that ships from the vendor with this board is
+the _TinyFPGA-Bootloader_ which is not a DFU bootloader. `muacm` will
+still expose a DFU runtime interface and you can use `dfu-util -e` to
+programmatically reset the board back to the bootloader if you
+properly set `BOOT_IMAGE` to `0b00` but you will need to use `tinyprog`
+to actually flash a bitstream.
+
+Finally, the _TinyFPGA-Bootloader_ always boots first when plugging
+the board into a USB port and will only boot the user bitstream if
+either a new bitstream was just programmed, or by using `tinyprog -b`.
+Refer to the board manual for more information about its bootloader
+operations.
 
 
 License
