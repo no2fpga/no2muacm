@@ -139,6 +139,36 @@ Make sure to run `make clean` between changing board configuration
 since simply changing the `BOARD` variable will not trigger a rebuild.
 
 
+Board specific notes
+--------------------
+
+### 1BitSquared iCEBreaker Bitsy
+
+Those boards are probably the best supported and since they ship with
+`no2bootloader` as the main way of loading firmware onto them will
+integrate nicely with this project.
+
+
+### FOMU using `fooboot`
+
+`foboot` is a DFU bootloader so it integrates pretty well with the
+DFU runtime provided by `muacm` if you set the `BOOT_IMAGE` to `0b00`
+(which is the slot where `foboot` resides). Note that on power up
+`foboot` always starts by default and you need to explicitely start
+the user bitstream using `dfu-util -e`.
+
+For the `fomu`, since there is no physical button, what is used is
+the IO pad 1 and can be 'pressed' by shorting it to ground (for instance
+by using tweezers).
+
+
+### FOMU using `no2bootloader`
+
+If you have replaced the bootloader on your FOMU with `no2bootloader`
+instead, then the notes above regarding the `BOOT_IMAGE` settings don't
+apply.
+
+
 License
 -------
 
