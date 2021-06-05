@@ -171,7 +171,7 @@ module top (
 		.BTN_MODE(3),
 		.BOOT_IMAGE(BOOT_IMAGE)
 	) dfu_helper_I (
-		.boot_sel (2'b01),
+		.boot_sel (BOOT_IMAGE),
 		.boot_now (bootloader),
 		.btn_in   (btn),
 		.btn_tick (),
