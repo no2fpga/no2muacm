@@ -1,6 +1,7 @@
 CROSS ?= riscv-none-embed-
 CC = $(CROSS)gcc
 OBJCOPY = $(CROSS)objcopy
+NM = $(CROSS)nm
 CFLAGS=-Wall -Os -march=rv32i -mabi=ilp32 -ffreestanding -nostartfiles --specs=nano.specs -mno-relax -I.
 
 OUT_DIR=../build
@@ -20,6 +21,7 @@ TARGETS = $(addprefix $(OUT_DIR)/, \
 	usb_rxbuf.hex \
 	usb_ep.hex \
 	cpu_rf.hex \
+	meta.json \
 )
 
 
@@ -56,9 +58,15 @@ $(OUT_DIR)/cpu_rf.hex: main.cpu_rf.bin
 	./bin2hex.py $< $@ rf
 
 
+# Meta data for customizer
+
+$(OUT_DIR)/meta.json: main.elf
+	$(NM) -S $< | ../utils/gen_metadata.py > $@
+
+
 # Cleanup
 
 clean:
-	rm -f *.elf *.bin $(OUT_DIR)/*.hex
+	rm -f *.elf *.bin $(OUT_DIR)/*.hex $(OUT_DIR)/meta.json
 
 .PHONY: clean

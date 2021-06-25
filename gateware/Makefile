@@ -39,13 +39,14 @@ SRCS_MUACM = $(abspath $(addprefix rtl/, \
 	muacm.v \
 ))
 
-HEX_DATA = $(addprefix $(OUT_DIR)/, \
+AUX_DATA = $(addprefix $(OUT_DIR)/, \
 	cpu_rf.hex \
 	text.hex \
 	usb_ep.hex \
 	usb_rxbuf.hex \
 	usb_txbuf.hex \
 	usb_trans_mc.hex \
+	meta.json \
 )
 
 # Build config / tgt
@@ -58,21 +59,23 @@ sim: $(OUT_DIR)/muacm_tb
 $(OUT_DIR):
 	mkdir -p $(OUT_DIR)
 
-$(OUT_DIR)/cpu_rf.hex $(OUT_DIR)/text.hex $(OUT_DIR)/usb_ep.hex $(OUT_DIR)/usb_rxbuf.hex $(OUT_DIR)/usb_txbuf.hex:
+$(AUX_DATA):
 	make -C ../firmware $@
 
 $(OUT_DIR)/usb_trans_mc.hex: ./cores/no2usb/utils/microcode.py
 	./cores/no2usb/utils/microcode.py mini > $@
 
 # Pre-built core
-$(OUT_DIR)/muacm.ilang $(OUT_DIR)/muacm.v: $(OUT_DIR) $(HEX_DATA) $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM)
+$(OUT_DIR)/muacm.ilang $(OUT_DIR)/muacm.v: $(OUT_DIR) $(AUX_DATA) $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM)
 	cd ../build && \
 	yosys \
 		-L $(OUT_DIR)/synth.log \
 		-p 'read_verilog -DSERV_INIT_RAM="cpu_rf.hex" -I../build $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM); synth_ice40 -abc2 -top muacm; write_ilang $(OUT_DIR)/muacm.ilang; write_verilog $(OUT_DIR)/muacm.v'
+	echo "# META: $$(cat $(OUT_DIR)/meta.json)" >> $(OUT_DIR)/muacm.ilang
+	echo "/* META: $$(cat $(OUT_DIR)/meta.json) */" >> $(OUT_DIR)/muacm.v
 
 # Test bench
-$(OUT_DIR)/%_tb: $(OUT_DIR) $(HEX_DATA) $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM) sim/%_tb.v
+$(OUT_DIR)/%_tb: $(OUT_DIR) $(AUX_DATA) $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM) sim/%_tb.v
 	iverilog \
 		-DNO_ICE40_DEFAULT_ASSIGNMENTS \
 		-DSIM -DSERV_INIT_RAM=\"cpu_rf.hex\" \
