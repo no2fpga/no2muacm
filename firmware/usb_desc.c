@@ -238,7 +238,7 @@ static const struct usb_str_desc desc_str2 __attribute__((section(".usb_txbuf.de
 	.bLength		= STR2_LEN,
 	.bDescriptorType	= USB_DT_STR,
 	.wString		= {
-		'N', 'i', 't', 'r', 'o', ' ', 'F', 'P', 'G', 'A',
+		'N', 'i', 't', 'r', 'o', ' ', 'F', 'P', 'G', 'A', 0, 0, 0, 0, 0, 0,
 	},
 };
 
@@ -247,7 +247,7 @@ static const struct usb_str_desc desc_str3 __attribute__((section(".usb_txbuf.de
 	.bLength		= STR3_LEN,
 	.bDescriptorType	= USB_DT_STR,
 	.wString		= {
-		0x03bc, 'a', 'c', 'm',
+		0x03bc, 'a', 'c', 'm', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	},
 };
 
