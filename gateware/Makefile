@@ -51,7 +51,7 @@ HEX_DATA = $(addprefix $(OUT_DIR)/, \
 # Build config / tgt
 OUT_DIR := ../build
 
-all: $(OUT_DIR)/muacm.ilang
+all: $(OUT_DIR)/muacm.ilang $(OUT_DIR)/muacm.v
 sim: $(OUT_DIR)/muacm_tb
 
 # Dependencies
@@ -65,11 +65,11 @@ $(OUT_DIR)/usb_trans_mc.hex: ./cores/no2usb/utils/microcode.py
 	./cores/no2usb/utils/microcode.py mini > $@
 
 # Pre-built core
-$(OUT_DIR)/muacm.ilang: $(OUT_DIR) $(HEX_DATA) $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM)
+$(OUT_DIR)/muacm.ilang $(OUT_DIR)/muacm.v: $(OUT_DIR) $(HEX_DATA) $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM)
 	cd ../build && \
 	yosys \
 		-L $(OUT_DIR)/synth.log \
-		-p 'read_verilog -DSERV_INIT_RAM="cpu_rf.hex" -I../build $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM); synth_ice40 -abc2 -top muacm; write_ilang $@'
+		-p 'read_verilog -DSERV_INIT_RAM="cpu_rf.hex" -I../build $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM); synth_ice40 -abc2 -top muacm; write_ilang $(OUT_DIR)/muacm.ilang; write_verilog $(OUT_DIR)/muacm.v'
 
 # Test bench
 $(OUT_DIR)/%_tb: $(OUT_DIR) $(HEX_DATA) $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2ICE40) $(SRCS_MUACM) sim/%_tb.v
@@ -88,7 +88,7 @@ $(OUT_DIR)/%_tb: $(OUT_DIR) $(HEX_DATA) $(SRCS_SERV) $(SRCS_NO2USB) $(SRCS_NO2IC
 		sim/$*_tb.v
 
 clean:
-	rm -f $(OUT_DIR)/muacm.ilang $(OUT_DIR)/muacm_tb $(OUT_DIR)/synth.log
+	rm -f $(OUT_DIR)/muacm.ilang $(OUT_DIR)/muacm.v $(OUT_DIR)/muacm_tb $(OUT_DIR)/synth.log
 	make -C ../firmware clean
 
 .PHONY: clean
