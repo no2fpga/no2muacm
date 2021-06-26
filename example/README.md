@@ -25,12 +25,22 @@ domain boundary from the USB domain into any other clock domain
 as required by the user application.
 
 
+Nitro μACM core:
+----------------
+
+For details about the core itself and its interface, please
+refer to the top level `README.md`.
+
+If you're using the example binary distribution package, then
+this should be available here as `README-core.md`.
+
+
 Clocking Infos:
 ---------------
 
-As mentionned above, the μACM core itself is required to run
-at 48 MHz to operate properly (USB is 12 MBits and we use 4x
-oversampling for clock recovery).
+The μACM core itself is required to run at 48 MHz to operate
+properly (USB is 12 MBits and we use 4x oversampling for clock
+recovery).
 
 In this project the 48 MHz clock can come from 2 sources depending
 on the `HFOSC` define at the top of `top.v`:
@@ -85,30 +95,6 @@ at the beginning of `top.v` or by changing some `localparam` :
    if you're using the `no2bootloader`. However if using `foboot`,
    it lives in image `0b00` and so that's what should be selected
    to trigger a reboot to `foboot`.
-
-
-Data interface:
----------------
-
-The data interface is synchronous to the clock of the μACM module
-and is essentially a pair of AXI Streaming interfaces, one for
-RX and one for TX.
-
- - `data` is the 8 bit data to/from the host
- - `last` is the packet delineation marker. For `out` (i.e. from host to
-    FPGA) it indicates the USB packets boundary as received from the host.
-    For `in`, it can be used to force sending short packets.
- - `valid` and `ready` are the handshake signals. Data transfer happens
-   when both signals are high on the same cycle.
-
-The `in` interface also has two additional control signals that are
-independent from the streaming interface :
-
- - `in_flush_now`: Indicates that whatever pending data is still in buffers
-   should be sent to the host ASAP.
- - `in_flush_time`: Indicates that any pending data can be sent to the host
-   after some reasonable timeout (to avoid data staying in buffer waiting to
-   fill a full USB packet).
 
 
 Build:
