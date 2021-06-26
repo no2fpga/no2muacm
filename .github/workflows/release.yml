@@ -36,8 +36,8 @@ jobs:
               with:
                 name: muacm-build
                 path: |
-                  build/muacm-*.ilang.bz2
-                  build/muacm-*.tar.bz2
+                  build/muacm-bin-*.tar.bz2
+                  build/muacm-example-*.tar.bz2
 
             - name: Release (as draft)
               uses: softprops/action-gh-release@v1
@@ -46,7 +46,7 @@ jobs:
                 tag_name: ${{ env.TAG }}
                 draft: true
                 files: |
-                  build/muacm-*.ilang.bz2
-                  build/muacm-*.tar.bz2
+                  build/muacm-bin-*.tar.bz2
+                  build/muacm-example-*.tar.bz2
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
