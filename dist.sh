@@ -19,6 +19,7 @@ mkdir -p "${DEST_BIN}"
 
 cp "build/muacm.ilang" "${DEST_BIN}"
 cp "build/muacm.v" "${DEST_BIN}"
+cp "example/rtl/muacm_xclk.v" "${DEST_BIN}"
 cp "utils/muacm_customize.py" "${DEST_BIN}"
 
 cp "README.md" "${DEST_BIN}/README-core.md"
