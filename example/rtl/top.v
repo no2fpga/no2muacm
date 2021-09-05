@@ -88,7 +88,7 @@ module top (
 	);
 
 	// Cross clock to 'user' domain
-	uacm_xclk xclk_usr2usb_I (
+	muacm_xclk xclk_usr2usb_I (
 		.i_data (in_usr_data),
 		.i_last (in_usr_last),
 		.i_valid(in_usr_valid),
@@ -102,7 +102,7 @@ module top (
 		.rst    (rst_usb)
 	);
 
-	uacm_xclk xclk_usb2usr_I (
+	muacm_xclk xclk_usb2usr_I (
 		.i_data (out_usb_data),
 		.i_last (out_usb_last),
 		.i_valid(out_usb_valid),

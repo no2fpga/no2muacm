@@ -12,7 +12,7 @@
 
 `default_nettype none
 
-module uacm_xclk (
+module muacm_xclk (
 	input  wire [7:0] i_data,
 	input  wire       i_last,
 	input  wire       i_valid,
@@ -76,4 +76,4 @@ module uacm_xclk (
 		else
 			i_ready <= ack_sync_i[0] & ~ack_sync_i[1];
 
-endmodule // uacm_xclk
+endmodule // muacm_xclk
